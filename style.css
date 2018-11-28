@@ -1,0 +1,45 @@
+body,html {
+	padding:0;
+	margin:0;
+}
+
+.MainMenu {
+	position: absolute;
+	height:100%;
+	width:100%;
+	background: white;
+}
+
+h1 {
+	font-size: 4em
+}
+
+* {
+	text-align: center;
+	font-family: Roboto;
+}
+
+button {
+	background:black;
+	border:0;
+	padding:10px 50px;
+	border-radius:5px;
+	color:white;
+	font-size:2em;
+	transition:0.2s;
+}
+
+button:hover {
+	background:#444444;
+}
+
+canvas {
+	position: absolute;
+	top:0;
+	right:0;
+	left:0;
+	bottom:0;
+	border:2px solid black;
+	z-index:-10;
+	margin:auto;
+}
