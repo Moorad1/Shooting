@@ -15,7 +15,7 @@ var keys = {
 	left:false,
 	up:false,
 	down:false
-}
+};
 
 var btn = document.getElementById('play');
 var mainMenu = document.getElementsByClassName('MainMenu')[0];
@@ -23,12 +23,22 @@ var canvas = document.getElementById('canvas');
 canvas.height = 600;
 canvas.width = 750;
 var player = new Player(0,0,3);
-
+var mouse = {
+	x:-100,
+	y:-100
+}
 var ctx = canvas.getContext('2d');
+var crossHairImg = new Image();
+crossHairImg.src = 'Assets/crossHair.png';
 
 btn.addEventListener('click', () => {
 	mainMenu.style.display = 'none';
 });	
+
+canvas.addEventListener('mousemove', (evt) => {
+	mouse.x = evt.offsetX;
+	mouse.y = evt.offsetY;
+})
 
 loop();
 
@@ -37,7 +47,8 @@ function loop() {
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	player.draw();
 	movement();
-	console.log(player)
+	crossHair();
+	Shooting();	
 }
 
 document.onkeydown = (e) => {
@@ -84,4 +95,12 @@ document.onkeyup = (e) => {
 	if (e.keyCode === 39) {
 		keys.right = false;
 	}
+}
+
+function crossHair() {
+	ctx.drawImage(crossHairImg,mouse.x - 40,mouse.y - 40,80,80);
+}
+
+function Shooting() {
+	console.log(Math.floor(Math.atan2(mouse.y - player.y, mouse.x - player.x) * 180 / Math.PI)+180);
 }
