@@ -1,5 +1,5 @@
-var socket = io('https://shootinggame-wgrnmjtyhm.now.sh');
-console.log(socket.id);
+var socket = io('shootinggame-wgrnmjtyhm.now.sh');
+console.log(socket.id);	
 class Player {
 	constructor(x, y, socket) {
 		this.x = x,
@@ -20,10 +20,18 @@ class FullPlayer {
 		this.velocityY = velocityY;
 		this.health = health;
 		this.size = size;
+		this.dead = false;
 	}
 
 	draw() {
 		ctx.fillRect(this.x, this.y, this.size, this.size);
+	}
+
+	restart() {
+		this.dead = false;
+		this.x = 0;
+		this.y = 0;
+		this.health = 5;
 	}
 }
 
@@ -98,7 +106,8 @@ loop();
 
 function loop() {
 	window.requestAnimationFrame(loop);
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle ='rgb(255,255,255)';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	bullets.forEach((element) => {
 		element.update();
 		element.draw();
@@ -138,13 +147,23 @@ document.onkeydown = (e) => {
 };
 
 function movement() {
-	player.y += player.velocityY;
-	player.x += player.velocityX;
-	if (player.velocityX != 0 || player.velocityY != 0)
+	if (player.dead == false) {
+		player.y += player.velocityY;
+		player.x += player.velocityX;
+		
+		if (player.velocityX != 0 || player.velocityY != 0)
+			socket.emit('coord', {
+				x: player.x,
+				y: player.y
+			});
+	} else  {
+		player.x = -100;
+		player.y = -100;
 		socket.emit('coord', {
 			x: player.x,
 			y: player.y
 		});
+	}
 }
 
 document.onkeyup = (e) => {
@@ -159,6 +178,10 @@ document.onkeyup = (e) => {
 	}
 	if (e.keyCode === 39 || e.keyCode === 68) {
 		player.velocityX = 0;
+	}
+
+	if (player.dead) {
+		player.restart();
 	}
 };
 
@@ -229,6 +252,16 @@ function drawHealth() {
 	ctx.fillStyle = '#F14A38CC';
 	ctx.fillRect(10,10,(200/5)*player.health,15);
 	ctx.strokeRect(10,10,200,15);
+	if (player.health <= 0) {
+		ctx.fillStyle = '#000000';
+		ctx.textAlign = 'center';
+		ctx.font = '70px Arial';
+		ctx.fillText('You are dead.',canvas.width/2,canvas.height/2)
+		ctx.font = '30px Arial';
+		ctx.fillText('Press Anything to restart...',canvas.width/2,canvas.height/2 + 50)
+		player.dead = true;
+		player.health = 0;
+	}
 }
 
 function renderMap(array) {
@@ -297,6 +330,6 @@ socket.emit('coord', {
 socket.on('c', (data) => {
 	console.log(data.socket);
 	if (socket.id == data.socket) {
-		player.health --;
+		player.health --;	
 	}
 });
